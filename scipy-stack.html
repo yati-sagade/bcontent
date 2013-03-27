@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Explog</title>
+        <link href="./theme/bootstrap/css/bootstrap.min.css" 
+              rel="stylesheet" media="screen"/>
+        <link href="./theme/css/explog.css" rel="stylesheet"
+              media="screen" />
+        <link href="./theme/css/font-awesome.min.css"
+              rel="stylesheet" media="screen" />
+        <link href="./theme/css/syntax.css" rel="stylesheet"
+              media="screen" />
+
+                    
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type= "text/javascript">
+       MathJax.Hub.Config({
+           config: ["MMLorHTML.js"],
+           jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
+           TeX: { extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], equationNumbers: { autoNumber: "AMS" } },
+           extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+           tex2jax: { 
+               inlineMath: [ ['$','$'] ],
+               displayMath: [ ['$$','$$'] ],
+               processEscapes: true },
+           "HTML-CSS": {
+               styles: { ".MathJax .mo, .MathJax .mi": {color: "black ! important"}}
+           }
+       });
+    </script>
+
+            </head>
+
+    <body>
+        <header class="row" id="main-page-heading">
+            <section class="row-fluid">
+                <section class="span12">
+                    <h1 class="muted">
+                        <a href=".">
+                            <span style="color:black;">exp</span><span style="color:rgb(0, 136, 204);">log</span>
+                        </a>
+                    </h1>
+                </section>
+            </section>
+        </header>
+        <hr />
+        <article class="container-fluid">
+            <section class="row-fluid">
+                <section class="span2">
+                    <section class="row-fluid">
+                        <section class="well sidebar-nav">
+                            <ul class="nav nav-list">
+                                <li class=""><a href=".">Home</a></li>
+                                <li class=" dropdown-submenu">
+                                    <a tabindex="-1" href="./categories.html">Categories</a>
+                                    <ul class="dropdown-menu">
+                                                                                <li>
+                                        <a tabindex="-1" href="./category/machine-learning.html">Machine Learning</a>
+                                        </li>
+                                                                                <li>
+                                        <a tabindex="-1" href="./category/misc.html">misc</a>
+                                        </li>
+                                                                                <li>
+                                        <a tabindex="-1" href="./category/python.html">python</a>
+                                        </li>
+                                                                            </ul>
+                                </li>
+                            </ul>
+                            <ul class="nav nav-list">
+                                <li class="divider"></li>
+                                <li class=""><a href="./pages/about.html">About</a></li>
+                            </ul>
+                        </section>
+                    </section>
+                    <section class="row-fluid">
+                        <section class="span12">
+                            <span class="nav-header">Tag Cloud</span>
+                            <section class="well sidebar-nav" id="tag-cloud">
+                                <ul>
+                                                                        <li class="tag-4"><a href="./tag/decorators.html">decorators</a></li>
+                                                                        <li class="tag-2"><a href="./tag/lisp.html">lisp</a></li>
+                                                                        <li class="tag-1"><a href="./tag/programming.html">programming</a></li>
+                                                                        <li class="tag-4"><a href="./tag/machine-learning.html">machine-learning</a></li>
+                                                                        <li class="tag-4"><a href="./tag/algorithms.html">algorithms</a></li>
+                                                                        <li class="tag-4"><a href="./tag/math.html">math</a></li>
+                                                                        <li class="tag-2"><a href="./tag/python.html">python</a></li>
+                                                                    </ul>
+                            </section>
+                        </section>
+                    </section>
+                </section>
+                <section class="span9">
+    <section class="row-fluid">
+        <header class="span9 article-heading">
+            <h1><a href="scipy-stack.html" rel="bookmark"
+                   title="Permalink to A scientific computing stack for Python">
+                   A scientific computing stack for Python</a></h1>
+        </header>
+        <section class="span3">
+            Sat 15 December 2012 
+        </section>
+    </section>
+    <section class="row-fluid">
+        <section class="span11 article-content">
+            <p>I have recently started doing quite a bit of numerical and scientific computing
+in Python. Since Python is a general purpose language, the numerical computing
+abilities are provided to it by some excellent mathematical packages. This post
+describes how I got my environment set up.</p>
+<p>It is needed to have Python installed, which is not a problem on most Linux
+distros nowadays anyway. The Windows installation is also pretty
+straightforward (check out the <a class="reference external" href="http://www.python.org">official Python website</a>).</p>
+<p>I am running 64-bit Debian Sid, but the library names should be easily
+obtainable for other (non-Debian based) distros as well.</p>
+<p>I assume a virtualenv installation(you <em>are</em> using virtualenvs, right?)</p>
+<p>We need some libraries to get us started. They can be installed like so:</p>
+<pre class="code text literal-block">
+# aptitude install libamd2.2.0 libblas3gf libc6 libgcc1 libgfortran3 \
+  liblapack3gf libumfpack5.4.0 libstdc++6 build-essential gfortran \
+  libatlas-dev libatlas3-base python python-all-dev gcc g++ libblas-dev \
+  liblapack-dev
+</pre>
+<p>Next, we install <a class="reference external" href="http://numpy.org">NumPy</a></p>
+<pre class="code text literal-block">
+(scicomp)$ pip install numpy
+</pre>
+<p>After this, it is <a class="reference external" href="http://scipy.org">SciPy</a></p>
+<pre class="code text literal-block">
+(scicomp)$ pip install scipy
+</pre>
+<p>That is going to take a while, by the way.</p>
+<p>Now, we would like to install <a class="reference external" href="http://matplotlib.org">matplotlib</a>, which is
+a 2-D plotting library for Python. Now Matplotlib is not very friendly with
+pip/easy_install on many systems. So, we will install from source.</p>
+<p>First, clone the matplotlib repo:</p>
+<pre class="code text literal-block">
+$ git clone git://github.com/matplotlib/matplotlib.git
+</pre>
+<p>Then run <tt class="code docutils literal">setup.py</tt> without any args to see if all is well</p>
+<pre class="code text literal-block">
+(scicomp)$ cd matplotlib
+(scicomp)$ python setup.py
+</pre>
+<p>This should show you a list of requirements and whether they were found on
+your system or not. The important section is the backends section. If none of
+the supported backends is installed on your system (e.g., Tk, PyGTK, PyQT etc),
+you will want to install one. We will go for the simplest, Tk for the TkAgg
+backend.</p>
+<pre class="code text literal-block">
+# aptitude install tcl-dev tk-dev python-tk
+</pre>
+<p>After this, we can actually install matplotlib. Switch to the cloned repo
+directory and run</p>
+<pre class="code text literal-block">
+(scicomp)$ python setup.py install
+</pre>
+<p>This should install matplotlib in your virtualenv. Now, to play with all the
+goodies we have, we might optionally want to install <a class="reference external" href="http://ipython.org/">ipython</a>,
+a superior alternative to the standard Python shell.</p>
+<pre class="code text literal-block">
+(scicomp)$ pip install ipython
+</pre>
+<p>Now, fire up ipython and check if all went well</p>
+<pre class="code python literal-block">
+<span class="p">(</span><span class="n">scicomp</span><span class="p">)</span><span class="err">$</span> <span class="n">ipython</span> <span class="o">--</span><span class="n">pylab</span>
+<span class="n">Python</span> <span class="mf">2.7</span><span class="o">.</span><span class="mi">3</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Sep</span>  <span class="mi">9</span> <span class="mi">2012</span><span class="p">,</span> <span class="mi">17</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">34</span><span class="p">)</span>
+<span class="n">Type</span> <span class="s">&quot;copyright&quot;</span><span class="p">,</span> <span class="s">&quot;credits&quot;</span> <span class="ow">or</span> <span class="s">&quot;license&quot;</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="o">.</span>
+
+<span class="n">IPython</span> <span class="mf">0.13</span><span class="o">.</span><span class="mi">1</span> <span class="o">--</span> <span class="n">An</span> <span class="n">enhanced</span> <span class="n">Interactive</span> <span class="n">Python</span><span class="o">.</span>
+<span class="err">?</span>         <span class="o">-&gt;</span> <span class="n">Introduction</span> <span class="ow">and</span> <span class="n">overview</span> <span class="n">of</span> <span class="n">IPython</span><span class="s">'s features.</span>
+<span class="o">%</span><span class="n">quickref</span> <span class="o">-&gt;</span> <span class="n">Quick</span> <span class="n">reference</span><span class="o">.</span>
+<span class="n">help</span>      <span class="o">-&gt;</span> <span class="n">Python</span><span class="s">'s own help system.</span>
+<span class="nb">object</span><span class="err">?</span>   <span class="o">-&gt;</span> <span class="n">Details</span> <span class="n">about</span> <span class="s">'object'</span><span class="p">,</span> <span class="n">use</span> <span class="s">'object??'</span> <span class="k">for</span> <span class="n">extra</span> <span class="n">details</span><span class="o">.</span>
+
+<span class="n">Welcome</span> <span class="n">to</span> <span class="n">pylab</span><span class="p">,</span> <span class="n">a</span> <span class="n">matplotlib</span><span class="o">-</span><span class="n">based</span> <span class="n">Python</span> <span class="n">environment</span> <span class="p">[</span><span class="n">backend</span><span class="p">:</span> <span class="n">TkAgg</span><span class="p">]</span><span class="o">.</span>
+<span class="n">For</span> <span class="n">more</span> <span class="n">information</span><span class="p">,</span> <span class="nb">type</span> <span class="s">'help(pylab)'</span><span class="o">.</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">pie</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+<span class="p">([</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Wedge</span> <span class="n">at</span> <span class="mh">0x44a9b50</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Wedge</span> <span class="n">at</span> <span class="mh">0x44ad1d0</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Wedge</span> <span class="n">at</span> <span class="mh">0x44ad810</span><span class="o">&gt;</span><span class="p">],</span>
+ <span class="p">[</span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Text</span> <span class="n">at</span> <span class="mh">0x44ad150</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Text</span> <span class="n">at</span> <span class="mh">0x44ad790</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Text</span> <span class="n">at</span> <span class="mh">0x44add90</span><span class="o">&gt;</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre>
+<p>This should bring up a pie chart. If it does not, there is some problem with
+the installation of some package. Additionally, to do R like statistical
+analysis, you might also want to install the superb <a class="reference external" href="http://pandas.pydata.org/">pandas</a>
+library.</p>
+<pre class="code text literal-block">
+(scicomp)$ pip install pandas
+</pre>
+<p>This should give you a super powerful environment for doing data processing
+and analysis.</p>
+
+        </section>
+    </section>
+</section>
+            </section>
+        </article>
+        <hr />
+        <footer class="row-fluid muted" id="footer">
+            <section class="span12" id="connect">
+                <ul>
+                    <li class="social-icon">
+                        <a href="./pages/about.html">About</a>
+                    </li> |
+                                        <li class="social-icon">
+                        <a href="http://www.twitter.com/yati_itay" title="twitter"><i class="icon-twitter icon-large"></i></a>
+                    </li> |                                         <li class="social-icon">
+                        <a href="http://www.github.com/yati-sagade" title="github"><i class="icon-github icon-large"></i></a>
+                    </li> |                                         <li class="social-icon">
+                        <a href="https://plus.google.com/102607933018279616737" title="google-plus"><i class="icon-google-plus icon-large"></i></a>
+                    </li>                     
+                    |<li class="social-icon">
+                        <a href="https://github.com/yati-sagade/explog-theme" title="get this theme">Get this theme</a>
+                    </li>
+                </ul>
+            </section>
+        </footer>
+                <script src="./theme/js/jquery-1.8.3.min.js"></script>
+        <script src="./theme/bootstrap/js/bootstrap.min.js"></script>
+    </body>
+</html>

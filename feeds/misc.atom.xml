@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>explog</title><link href="/" rel="alternate"></link><link href="/feeds/misc.atom.xml" rel="self"></link><id>/</id><updated>2013-03-24T00:00:00+01:00</updated><entry><title>Learning Common Lisp - Functions 2</title><link href="/understanding-lisp-functions-2.html" rel="alternate"></link><updated>2013-03-24T00:00:00+01:00</updated><author><name>Yati Sagade</name></author><id>tag:,2013-03-24:understanding-lisp-functions-2.html</id><summary type="html">&lt;p&gt;In Lisp, functions are just another kind of object. The DEFUN macro creates a
+new function object and gives a name to it, which is what is used to call the
+function. Nameless functions can be created using LAMBDA.&lt;/p&gt;
+&lt;p&gt;There is a special operator called FUNCTION that, given an unquoted name of a
+function, returns the function object by that name.&lt;/p&gt;
+&lt;p&gt;Once we have a function object, it can be invoked using either of the functions
+FUNCALL and APPLY. When the number of arguments that the function takes is
+known, FUNCALL can be used. It takes a function object as its first argument
+and all subsequent arguments are passed to the function itself. i.e.,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(foo 1 2 3) === (funcall #&amp;#39;foo 1 2 3)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For example, this function &lt;cite&gt;plot&lt;/cite&gt; takes a function, the min and max X values
+and the step and plots a simple ASCII plot of the function in the range
+[min, max]&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun plot (fn min max step)
+  (loop for i from min to max do
+        (loop repeat (fn i) (format t &amp;quot;*&amp;quot;))
+        (format t &amp;quot;~%&amp;quot;)))
+
+(plot #&amp;#39;(lambda (x) (* x x)) -5 5 .5)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;will print&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;*************************
+*********************
+****************
+*************
+*********
+*******
+****
+***
+*
+*
+
+*
+*
+***
+****
+*******
+*********
+*************
+****************
+*********************
+*************************
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When the arguments to be passed to a function are available as a list, APPLY
+can be used conveniently. Say plot-data is a list containing a function, the
+min and the max values, and the step value. Then, plot can be invoked as:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(apply #&amp;#39;plot plot-data)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;APPLY expects the function as its first argument and then, it expects a list,
+which is to eventually become the argument list of the passed in function. It
+also supports loose arguments. Say plot-data only contained min, max and step.
+We can still call the PLOT function to plot the exponential function as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(apply #&amp;#39;plot #&amp;#39;exp plot-data)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This, in effect, clubs the arguments after the first argument into a single
+list which is then passed to the function object given by the first argument.&lt;/p&gt;
+&lt;div class="section" id="anonymous-functions"&gt;
+&lt;h2&gt;Anonymous functions&lt;/h2&gt;
+&lt;p&gt;When a function is used only at a single place, such as to pass a callback to
+another function, defining a named function might be an overkill, and one can
+use anonymous functions in such cases. These are created using LAMBDA
+expressions. A lambda expression has the following form:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(lambda (parameters) body)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;A lambda expression can also be thought of as a function name where the name
+itself specifies what the function does. We can use lambda expressions anywhere
+we would use function names.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(funcall #&amp;#39;(lambda (x y) (+ x y)) 2 3)
+;; 5
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;OR&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;((lambda (x y) (+ x y)) 2 3)
+;; 5
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+</summary><category term="programming"></category><category term="lisp"></category></entry><entry><title>Learning Common Lisp - Functions 1</title><link href="/understanding-lisp-functions.html" rel="alternate"></link><updated>2013-02-18T00:00:00+01:00</updated><author><name>Yati Sagade</name></author><id>tag:,2013-02-18:understanding-lisp-functions.html</id><summary type="html">&lt;p&gt;I have finally started to learn Lisp, and I've chosen Common Lisp as my Lisp.
+I'm following the excellent &lt;em&gt;free&lt;/em&gt; book &lt;a class="reference external" href="http://www.gigamonkeys.com/book/"&gt;Practical Common Lisp&lt;/a&gt; by Peter
+Seibel. Lisp syntax is very simple, and compared to other languages I've learnt,
+it is a welcome breeze of fresh air.&lt;/p&gt;
+&lt;p&gt;A Lisp function is defined using the DEFUN macro, like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun name (parameter*)
+  &amp;quot;Optional docstring, a la Python.&amp;quot;
+  body-form*)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Any symbol can be used as a function name, and the convention is to use
+hyphenated-words instead of underscore_separated_words or CamelCase.&lt;/p&gt;
+&lt;p&gt;The parameter list of a function defines the variables that will hold the
+arguments passed to the function when it is called. A function taking no args
+has an empty parameter list, written as ().&lt;/p&gt;
+&lt;p&gt;A string literal can be present after the parameter list, which, if present,
+serves the purpose of documenting the function. This string is associated with
+the function's name and can be later retrieved using the DOCUMENTATION function.&lt;/p&gt;
+&lt;p&gt;Finally, the body of a function consists of muliple forms, each of which is
+evaluated in order. The result of evaluation of the last form is returned as the
+return value of the function. One can also explicitly return from any point in
+the function body using the RETURN-FROM special operator.&lt;/p&gt;
+&lt;div class="section" id="optional-parameters"&gt;
+&lt;h2&gt;Optional parameters&lt;/h2&gt;
+&lt;p&gt;A function taking optional parameters can be defined by first specifying all
+the required params and then placing the symbol &amp;amp;optional followed by the names
+of the optional params.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun make-rect (width &amp;amp;optional height)
+  (list width (if height height width))
+
+(make-rect 10) ;; -&amp;gt; (10 10)
+(make-rect 10 20) ;; -&amp;gt; (10 20)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When an argument is absent for an optional param, it is bound to NIL.
+Default values can be provided with a parameter as arbitrary expressions.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun make-rect (width &amp;amp;optional (height width))
+  (list width height))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It is possible to check if the argument for a parameter was passed or not by
+placing another variable, following the default value expression, which is
+set to T when an argument is passed, else to NIL.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun make-rect (width &amp;amp;optional (height width height-supplied-p))
+  (list width height))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="rest-params"&gt;
+&lt;h2&gt;Rest params&lt;/h2&gt;
+&lt;p&gt;Rest params allow us to write functions accepting a variable number of
+arguments. A catch-all parameter can be specified after the &amp;amp;rest symbol, which
+captures all the arguments remaining after binding with required parameters.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun sum-of-squares (&amp;amp;rest args)
+  (apply &amp;#39;+ (loop while args
+                  collecting (let ((x (pop args))) (* x x)))))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(sum-of-squares 1 2 3) ;; 14
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="keyword-params"&gt;
+&lt;h2&gt;Keyword params&lt;/h2&gt;
+&lt;p&gt;After any required, optional and rest params in that order, we can specify
+keyword parameters, which are optional and can be passed in independent of
+their position in the param list. To specify keyword params, we must include the
+symbol &amp;amp;key and any number of keyword argument specifiers after that.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun greet (&amp;amp;key message name)
+   (format t &amp;quot;~a, ~a~%&amp;quot; (if message message &amp;quot;Hello&amp;quot;) (if name name &amp;quot;Lama&amp;quot;)))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now, GREET can be called like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(greet) ;; Hello, Lama
+(greet :name &amp;quot;Yati&amp;quot;) ;; Hello, Yati
+(greet :name &amp;quot;Yati&amp;quot; :message &amp;quot;Good morning&amp;quot;) ;; Good morning, Yati
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We can use default values and supplied-p params with keyword params as well:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun greet (&amp;amp;key (message &amp;quot;Hello&amp;quot;) (name &amp;quot;Lama&amp;quot; name-supplied-p))
+  (format t &amp;quot;~a, ~a~%&amp;quot; message name)
+  (if (not name-supplied-p) (format t &amp;quot;I still don&amp;#39;t know your real name&amp;quot;)))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This can now be called as&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(greet)
+;; Hello, Lama
+;; I do not know your name
+(greet :name &amp;quot;Lama&amp;quot;)
+;; Hello, Lama
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Note that in the second call, passing an explicit value for :name did not print
+the second &amp;quot;I do not know your name&amp;quot; message, even if the passed value was the
+same as the default value.&lt;/p&gt;
+&lt;p&gt;In case we want to use a concise name for a param in the function, while at the
+same time providing a descriptive param name to the caller, we can replace the
+name of a keyword param by another list that contains a keyword to be used while
+calling the function and the name for the param:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun rgb (&amp;amp;key ((:red r) 0) ((:green g) 0) ((:blue b)))
+  (list r g b))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;can be called as&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(rgb :red #xfe :blue #xac)
+;; (254 0 172)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When mixing the various types of parameters, the order should always be&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Required params&lt;/li&gt;
+&lt;li&gt;&amp;amp;optional params&lt;/li&gt;
+&lt;li&gt;&amp;amp;rest params&lt;/li&gt;
+&lt;li&gt;&amp;amp;key params&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Combining optional and keyword params is not such a good idea&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun foo (x &amp;amp;optional y &amp;amp;key z) (list x y z))
+;; (foo 1 2 :z 3)
+;; (1 2 3)
+;;
+;; (foo 1)
+;; (1 NIL NIL)
+;;
+;; (foo 1 :z 3)
+;; ERROR
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The reason why the last call resulted in an error is that even though we meant
+to pass the :z kwarg, Lisp would interpret the :z as the argument for the param
+&lt;cite&gt;y&lt;/cite&gt;, after which a keyword param or nothing is expected. But that leaves just 3
+which will not be parsed as a legal kwarg.&lt;/p&gt;
+&lt;p&gt;Mixing rest and keyword params, is, however safe. When both &amp;amp;rest and &amp;amp;key
+params are present in a function's parameter list, the passed in arguments,
+after filling in any required and optional parameters, are ALL collected into
+the &amp;amp;rest variable, along with the keywords and the appropriate &amp;amp;key params are
+also bound to appropriate values.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun foo (&amp;amp;rest rest &amp;amp;key a b c) (list rest a b c))
+;; (foo :a 12 :b 10)
+;; ((:A 12 :B 10) 12 10 NIL)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;But when &amp;amp;rest is followed by a &amp;amp;key, all that can be collected into the rest
+parameter variable is the plist passed in to the function for the keyword
+parameters.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="returning"&gt;
+&lt;h2&gt;Returning&lt;/h2&gt;
+&lt;p&gt;A function's return value is what the last form in the function's body
+evaluates to. To explicitly return control as a result of say, breaking out on
+a condition from nested control structures, the RETURN-FROM special operator is
+used. It is a general operator used to break out of any code block defined by
+the BLOCK special operator. DEFUN wraps the functions code in a code block using
+BLOCK and gives it the same name as the function. Hence, we can break out of a
+function using RETURN-FROM by passing it two arguments, the unquoted name of
+the function(unquoted because it is not eval'd) to return from and the value to
+return.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(defun foo (n)
+  (dotimes (i 10)
+    (dotimes (j 10)
+      (when (&amp;gt; (* i j) n)
+        (return-from foo (list i j))))))
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This finds the first pair of numbers, both less than 10, whose product is less
+than the argument n.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="programming"></category><category term="lisp"></category></entry><entry><title>A scientific computing stack for Python</title><link href="/scipy-stack.html" rel="alternate"></link><updated>2012-12-15T00:00:00+01:00</updated><author><name>Yati Sagade</name></author><id>tag:,2012-12-15:scipy-stack.html</id><summary type="html">&lt;p&gt;I have recently started doing quite a bit of numerical and scientific computing
+in Python. Since Python is a general purpose language, the numerical computing
+abilities are provided to it by some excellent mathematical packages. This post
+describes how I got my environment set up.&lt;/p&gt;
+&lt;p&gt;It is needed to have Python installed, which is not a problem on most Linux
+distros nowadays anyway. The Windows installation is also pretty
+straightforward (check out the &lt;a class="reference external" href="http://www.python.org"&gt;official Python website&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;I am running 64-bit Debian Sid, but the library names should be easily
+obtainable for other (non-Debian based) distros as well.&lt;/p&gt;
+&lt;p&gt;I assume a virtualenv installation(you &lt;em&gt;are&lt;/em&gt; using virtualenvs, right?)&lt;/p&gt;
+&lt;p&gt;We need some libraries to get us started. They can be installed like so:&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+# aptitude install libamd2.2.0 libblas3gf libc6 libgcc1 libgfortran3 \
+  liblapack3gf libumfpack5.4.0 libstdc++6 build-essential gfortran \
+  libatlas-dev libatlas3-base python python-all-dev gcc g++ libblas-dev \
+  liblapack-dev
+&lt;/pre&gt;
+&lt;p&gt;Next, we install &lt;a class="reference external" href="http://numpy.org"&gt;NumPy&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+(scicomp)$ pip install numpy
+&lt;/pre&gt;
+&lt;p&gt;After this, it is &lt;a class="reference external" href="http://scipy.org"&gt;SciPy&lt;/a&gt;&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+(scicomp)$ pip install scipy
+&lt;/pre&gt;
+&lt;p&gt;That is going to take a while, by the way.&lt;/p&gt;
+&lt;p&gt;Now, we would like to install &lt;a class="reference external" href="http://matplotlib.org"&gt;matplotlib&lt;/a&gt;, which is
+a 2-D plotting library for Python. Now Matplotlib is not very friendly with
+pip/easy_install on many systems. So, we will install from source.&lt;/p&gt;
+&lt;p&gt;First, clone the matplotlib repo:&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+$ git clone git://github.com/matplotlib/matplotlib.git
+&lt;/pre&gt;
+&lt;p&gt;Then run &lt;tt class="code docutils literal"&gt;setup.py&lt;/tt&gt; without any args to see if all is well&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+(scicomp)$ cd matplotlib
+(scicomp)$ python setup.py
+&lt;/pre&gt;
+&lt;p&gt;This should show you a list of requirements and whether they were found on
+your system or not. The important section is the backends section. If none of
+the supported backends is installed on your system (e.g., Tk, PyGTK, PyQT etc),
+you will want to install one. We will go for the simplest, Tk for the TkAgg
+backend.&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+# aptitude install tcl-dev tk-dev python-tk
+&lt;/pre&gt;
+&lt;p&gt;After this, we can actually install matplotlib. Switch to the cloned repo
+directory and run&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+(scicomp)$ python setup.py install
+&lt;/pre&gt;
+&lt;p&gt;This should install matplotlib in your virtualenv. Now, to play with all the
+goodies we have, we might optionally want to install &lt;a class="reference external" href="http://ipython.org/"&gt;ipython&lt;/a&gt;,
+a superior alternative to the standard Python shell.&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+(scicomp)$ pip install ipython
+&lt;/pre&gt;
+&lt;p&gt;Now, fire up ipython and check if all went well&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scicomp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt; &lt;span class="n"&gt;ipython&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="n"&gt;pylab&lt;/span&gt;
+&lt;span class="n"&gt;Python&lt;/span&gt; &lt;span class="mf"&gt;2.7&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Sep&lt;/span&gt;  &lt;span class="mi"&gt;9&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;17&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;41&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;34&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;Type&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;copyright&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;credits&amp;quot;&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;license&amp;quot;&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;more&lt;/span&gt; &lt;span class="n"&gt;information&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+
+&lt;span class="n"&gt;IPython&lt;/span&gt; &lt;span class="mf"&gt;0.13&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt; &lt;span class="n"&gt;An&lt;/span&gt; &lt;span class="n"&gt;enhanced&lt;/span&gt; &lt;span class="n"&gt;Interactive&lt;/span&gt; &lt;span class="n"&gt;Python&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;span class="err"&gt;?&lt;/span&gt;         &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Introduction&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;overview&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="n"&gt;IPython&lt;/span&gt;&lt;span class="s"&gt;'s features.&lt;/span&gt;
+&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;quickref&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Quick&lt;/span&gt; &lt;span class="n"&gt;reference&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;help&lt;/span&gt;      &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Python&lt;/span&gt;&lt;span class="s"&gt;'s own help system.&lt;/span&gt;
+&lt;span class="nb"&gt;object&lt;/span&gt;&lt;span class="err"&gt;?&lt;/span&gt;   &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Details&lt;/span&gt; &lt;span class="n"&gt;about&lt;/span&gt; &lt;span class="s"&gt;'object'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;use&lt;/span&gt; &lt;span class="s"&gt;'object??'&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;extra&lt;/span&gt; &lt;span class="n"&gt;details&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+
+&lt;span class="n"&gt;Welcome&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="n"&gt;pylab&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;based&lt;/span&gt; &lt;span class="n"&gt;Python&lt;/span&gt; &lt;span class="n"&gt;environment&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;backend&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;TkAgg&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;For&lt;/span&gt; &lt;span class="n"&gt;more&lt;/span&gt; &lt;span class="n"&gt;information&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="s"&gt;'help(pylab)'&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+
+&lt;span class="n"&gt;In&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt; &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;matplotlib&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;pyplot&lt;/span&gt;
+
+&lt;span class="n"&gt;In&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt; &lt;span class="n"&gt;pyplot&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pie&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+&lt;span class="n"&gt;Out&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;patches&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Wedge&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x44a9b50&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;patches&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Wedge&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x44ad1d0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;patches&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Wedge&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x44ad810&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+ &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Text&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x44ad150&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Text&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x44ad790&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;matplotlib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Text&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x44add90&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+
+&lt;span class="n"&gt;In&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt; &lt;span class="n"&gt;pyplot&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;show&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This should bring up a pie chart. If it does not, there is some problem with
+the installation of some package. Additionally, to do R like statistical
+analysis, you might also want to install the superb &lt;a class="reference external" href="http://pandas.pydata.org/"&gt;pandas&lt;/a&gt;
+library.&lt;/p&gt;
+&lt;pre class="code text literal-block"&gt;
+(scicomp)$ pip install pandas
+&lt;/pre&gt;
+&lt;p&gt;This should give you a super powerful environment for doing data processing
+and analysis.&lt;/p&gt;
+</summary></entry><entry><title>Calculating C(n, r) efficiently</title><link href="/efficient-c-n-r.html" rel="alternate"></link><updated>2012-10-27T00:00:00+02:00</updated><author><name>Yati Sagade</name></author><id>tag:,2012-10-27:efficient-c-n-r.html</id><summary type="html">&lt;p&gt;Recently, I needed to calculate the number of ways in which r items can be
+chosen from n identical items. This is a classical counting problem and the
+number of ways in which r items can be chosen from n items is also known as the
+combination represented as $C(n,r)$,  ${}^{n}C_{r}$ or $ n \choose r $.&lt;/p&gt;
+&lt;p&gt;The expression for calculating &lt;tt class="code docutils literal"&gt;C(n, r)&lt;/tt&gt; is
+$$ {n \choose r} = \frac{n(n-1)(n-2)...(n-k+1)}{k(k-1)...1} $$&lt;/p&gt;
+&lt;p&gt;or, equivalently, using factorials,&lt;/p&gt;
+&lt;p&gt;$$ {n \choose r} = \frac{n!}{k!(n-k)!} $$&lt;/p&gt;
+&lt;p&gt;One implementation would be to compute the constituent factorials and the
+perform the multiplication and division on them. But this is bad for 2 reasons&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;It is slow.&lt;/li&gt;
+&lt;li&gt;For even decent problems like $ {100 \choose 2} $, where the answer is 4950, the
+intermediate factorials are very large. 100! is approximately 9.33e57 and
+hence, languages that do not have numeric types to hold that kind of a
+number will overflow, wrecking a havoc - all for a result that fits well
+within 2 bytes!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A better implementation should use this recurrence:&lt;/p&gt;
+&lt;p&gt;$$ {n \choose r} =  \frac{n}{r} {{n-1} \choose {r-1}} $$&lt;/p&gt;
+&lt;p&gt;with&lt;/p&gt;
+&lt;p&gt;$$ {n \choose 1} = n $$
+$$ {n \choose 0} = 1 $$
+$$ {0 \choose r} = 0 $$&lt;/p&gt;
+&lt;p&gt;so, a recursive implementation in Python would look like&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;comb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="sd"&gt;    Find the number of ways r items can be chosen from a pool of n&lt;/span&gt;
+&lt;span class="sd"&gt;    identical items, with n &amp;gt;= r&lt;/span&gt;
+
+&lt;span class="sd"&gt;    &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;comb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;An iterative implementation is also not very difficult to arrive at:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;comb&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="sd"&gt;    Find the number of ways r items can be chosen from a pool of n&lt;/span&gt;
+&lt;span class="sd"&gt;    identical items, with n &amp;gt;= r&lt;/span&gt;
+
+&lt;span class="sd"&gt;    &amp;#39;&amp;#39;&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+    &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;xrange&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;*=&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;
+        &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;/=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;-=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+</summary><category term="python"></category><category term="math"></category><category term="algorithms"></category></entry></feed>
