@@ -54,7 +54,7 @@
                                     <a tabindex="-1" href="./categories.html">Categories</a>
                                     <ul class="dropdown-menu">
                                                                                 <li>
-                                        <a tabindex="-1" href="./category/machine-learning.html">Machine Learning</a>
+                                        <a tabindex="-1" href="./category/foss.html">FOSS</a>
                                         </li>
                                                                                 <li>
                                         <a tabindex="-1" href="./category/misc.html">misc</a>
@@ -76,13 +76,20 @@
                             <span class="nav-header">Tag Cloud</span>
                             <section class="well sidebar-nav" id="tag-cloud">
                                 <ul>
+                                                                        <li class="tag-4"><a href="./tag/Go.html">Go</a></li>
                                                                         <li class="tag-4"><a href="./tag/decorators.html">decorators</a></li>
-                                                                        <li class="tag-2"><a href="./tag/lisp.html">lisp</a></li>
-                                                                        <li class="tag-1"><a href="./tag/programming.html">programming</a></li>
-                                                                        <li class="tag-4"><a href="./tag/machine-learning.html">machine-learning</a></li>
-                                                                        <li class="tag-4"><a href="./tag/algorithms.html">algorithms</a></li>
-                                                                        <li class="tag-4"><a href="./tag/math.html">math</a></li>
+                                                                        <li class="tag-4"><a href="./tag/scipy.html">scipy</a></li>
+                                                                        <li class="tag-2"><a href="./tag/algorithms.html">algorithms</a></li>
+                                                                        <li class="tag-2"><a href="./tag/math.html">math</a></li>
                                                                         <li class="tag-2"><a href="./tag/python.html">python</a></li>
+                                                                        <li class="tag-4"><a href="./tag/scala.html">scala</a></li>
+                                                                        <li class="tag-4"><a href="./tag/functional-programming.html">functional-programming</a></li>
+                                                                        <li class="tag-1"><a href="./tag/programming.html">programming</a></li>
+                                                                        <li class="tag-1"><a href="./tag/lisp.html">lisp</a></li>
+                                                                        <li class="tag-4"><a href="./tag/machine-learning.html">machine-learning</a></li>
+                                                                        <li class="tag-4"><a href="./tag/Wikipedia.html">Wikipedia</a></li>
+                                                                        <li class="tag-4"><a href="./tag/MediaWiki.html">MediaWiki</a></li>
+                                                                        <li class="tag-4"><a href="./tag/FOSS.html">FOSS</a></li>
                                                                     </ul>
                             </section>
                         </section>
@@ -106,9 +113,9 @@ I'm following the excellent <em>free</em> book <a class="reference external" hre
 Seibel. Lisp syntax is very simple, and compared to other languages I've learnt,
 it is a welcome breeze of fresh air.</p>
 <p>A Lisp function is defined using the DEFUN macro, like so:</p>
-<div class="highlight"><pre>(defun name (parameter*)
-  &quot;Optional docstring, a la Python.&quot;
-  body-form*)
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">name</span> <span class="p">(</span><span class="nv">parameter*</span><span class="p">)</span>
+  <span class="s">&quot;Optional docstring, a la Python.&quot;</span>
+  <span class="nv">body-form*</span><span class="p">)</span>
 </pre></div>
 <p>Any symbol can be used as a function name, and the convention is to use
 hyphenated-words instead of underscore_separated_words or CamelCase.</p>
@@ -127,22 +134,22 @@ the function body using the RETURN-FROM special operator.</p>
 <p>A function taking optional parameters can be defined by first specifying all
 the required params and then placing the symbol &amp;optional followed by the names
 of the optional params.</p>
-<div class="highlight"><pre>(defun make-rect (width &amp;optional height)
-  (list width (if height height width))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">make-rect</span> <span class="p">(</span><span class="nv">width</span> <span class="k">&amp;optional</span> <span class="nv">height</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">list</span> <span class="nv">width</span> <span class="p">(</span><span class="k">if</span> <span class="nv">height</span> <span class="nv">height</span> <span class="nv">width</span><span class="p">))</span>
 
-(make-rect 10) ;; -&gt; (10 10)
-(make-rect 10 20) ;; -&gt; (10 20)
+<span class="p">(</span><span class="nv">make-rect</span> <span class="mi">10</span><span class="p">)</span> <span class="c1">;; -&gt; (10 10)</span>
+<span class="p">(</span><span class="nv">make-rect</span> <span class="mi">10</span> <span class="mi">20</span><span class="p">)</span> <span class="c1">;; -&gt; (10 20)</span>
 </pre></div>
 <p>When an argument is absent for an optional param, it is bound to NIL.
 Default values can be provided with a parameter as arbitrary expressions.</p>
-<div class="highlight"><pre>(defun make-rect (width &amp;optional (height width))
-  (list width height))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">make-rect</span> <span class="p">(</span><span class="nv">width</span> <span class="k">&amp;optional</span> <span class="p">(</span><span class="nv">height</span> <span class="nv">width</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">list</span> <span class="nv">width</span> <span class="nv">height</span><span class="p">))</span>
 </pre></div>
 <p>It is possible to check if the argument for a parameter was passed or not by
 placing another variable, following the default value expression, which is
 set to T when an argument is passed, else to NIL.</p>
-<div class="highlight"><pre>(defun make-rect (width &amp;optional (height width height-supplied-p))
-  (list width height))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">make-rect</span> <span class="p">(</span><span class="nv">width</span> <span class="k">&amp;optional</span> <span class="p">(</span><span class="nv">height</span> <span class="nv">width</span> <span class="nv">height-supplied-p</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">list</span> <span class="nv">width</span> <span class="nv">height</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="section" id="rest-params">
@@ -150,11 +157,11 @@ set to T when an argument is passed, else to NIL.</p>
 <p>Rest params allow us to write functions accepting a variable number of
 arguments. A catch-all parameter can be specified after the &amp;rest symbol, which
 captures all the arguments remaining after binding with required parameters.</p>
-<div class="highlight"><pre>(defun sum-of-squares (&amp;rest args)
-  (apply &#39;+ (loop while args
-                  collecting (let ((x (pop args))) (* x x)))))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">sum-of-squares</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nv">args</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">apply</span> <span class="ss">&#39;+</span> <span class="p">(</span><span class="nb">loop</span> <span class="nv">while</span> <span class="nv">args</span>
+                  <span class="nv">collecting</span> <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">x</span> <span class="p">(</span><span class="nb">pop</span> <span class="nv">args</span><span class="p">)))</span> <span class="p">(</span><span class="nb">*</span> <span class="nv">x</span> <span class="nv">x</span><span class="p">)))))</span>
 </pre></div>
-<div class="highlight"><pre>(sum-of-squares 1 2 3) ;; 14
+<div class="highlight"><pre><span class="p">(</span><span class="nv">sum-of-squares</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span> <span class="c1">;; 14</span>
 </pre></div>
 </div>
 <div class="section" id="keyword-params">
@@ -163,25 +170,25 @@ captures all the arguments remaining after binding with required parameters.</p>
 keyword parameters, which are optional and can be passed in independent of
 their position in the param list. To specify keyword params, we must include the
 symbol &amp;key and any number of keyword argument specifiers after that.</p>
-<div class="highlight"><pre>(defun greet (&amp;key message name)
-   (format t &quot;~a, ~a~%&quot; (if message message &quot;Hello&quot;) (if name name &quot;Lama&quot;)))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">greet</span> <span class="p">(</span><span class="k">&amp;key</span> <span class="nv">message</span> <span class="nv">name</span><span class="p">)</span>
+   <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;~a, ~a~%&quot;</span> <span class="p">(</span><span class="k">if</span> <span class="nv">message</span> <span class="nv">message</span> <span class="s">&quot;Hello&quot;</span><span class="p">)</span> <span class="p">(</span><span class="k">if</span> <span class="nv">name</span> <span class="nv">name</span> <span class="s">&quot;Lama&quot;</span><span class="p">)))</span>
 </pre></div>
 <p>Now, GREET can be called like so:</p>
-<div class="highlight"><pre>(greet) ;; Hello, Lama
-(greet :name &quot;Yati&quot;) ;; Hello, Yati
-(greet :name &quot;Yati&quot; :message &quot;Good morning&quot;) ;; Good morning, Yati
+<div class="highlight"><pre><span class="p">(</span><span class="nv">greet</span><span class="p">)</span> <span class="c1">;; Hello, Lama</span>
+<span class="p">(</span><span class="nv">greet</span> <span class="ss">:name</span> <span class="s">&quot;Yati&quot;</span><span class="p">)</span> <span class="c1">;; Hello, Yati</span>
+<span class="p">(</span><span class="nv">greet</span> <span class="ss">:name</span> <span class="s">&quot;Yati&quot;</span> <span class="ss">:message</span> <span class="s">&quot;Good morning&quot;</span><span class="p">)</span> <span class="c1">;; Good morning, Yati</span>
 </pre></div>
 <p>We can use default values and supplied-p params with keyword params as well:</p>
-<div class="highlight"><pre>(defun greet (&amp;key (message &quot;Hello&quot;) (name &quot;Lama&quot; name-supplied-p))
-  (format t &quot;~a, ~a~%&quot; message name)
-  (if (not name-supplied-p) (format t &quot;I still don&#39;t know your real name&quot;)))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">greet</span> <span class="p">(</span><span class="k">&amp;key</span> <span class="p">(</span><span class="nv">message</span> <span class="s">&quot;Hello&quot;</span><span class="p">)</span> <span class="p">(</span><span class="nv">name</span> <span class="s">&quot;Lama&quot;</span> <span class="nv">name-supplied-p</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;~a, ~a~%&quot;</span> <span class="nv">message</span> <span class="nv">name</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">not</span> <span class="nv">name-supplied-p</span><span class="p">)</span> <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;I still don&#39;t know your real name&quot;</span><span class="p">)))</span>
 </pre></div>
 <p>This can now be called as</p>
-<div class="highlight"><pre>(greet)
-;; Hello, Lama
-;; I do not know your name
-(greet :name &quot;Lama&quot;)
-;; Hello, Lama
+<div class="highlight"><pre><span class="p">(</span><span class="nv">greet</span><span class="p">)</span>
+<span class="c1">;; Hello, Lama</span>
+<span class="c1">;; I do not know your name</span>
+<span class="p">(</span><span class="nv">greet</span> <span class="ss">:name</span> <span class="s">&quot;Lama&quot;</span><span class="p">)</span>
+<span class="c1">;; Hello, Lama</span>
 </pre></div>
 <p>Note that in the second call, passing an explicit value for :name did not print
 the second &quot;I do not know your name&quot; message, even if the passed value was the
@@ -190,12 +197,12 @@ same as the default value.</p>
 same time providing a descriptive param name to the caller, we can replace the
 name of a keyword param by another list that contains a keyword to be used while
 calling the function and the name for the param:</p>
-<div class="highlight"><pre>(defun rgb (&amp;key ((:red r) 0) ((:green g) 0) ((:blue b)))
-  (list r g b))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">rgb</span> <span class="p">(</span><span class="k">&amp;key</span> <span class="p">((</span><span class="ss">:red</span> <span class="nv">r</span><span class="p">)</span> <span class="mi">0</span><span class="p">)</span> <span class="p">((</span><span class="ss">:green</span> <span class="nv">g</span><span class="p">)</span> <span class="mi">0</span><span class="p">)</span> <span class="p">((</span><span class="ss">:blue</span> <span class="nv">b</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nb">list</span> <span class="nv">r</span> <span class="nv">g</span> <span class="nv">b</span><span class="p">))</span>
 </pre></div>
 <p>can be called as</p>
-<div class="highlight"><pre>(rgb :red #xfe :blue #xac)
-;; (254 0 172)
+<div class="highlight"><pre><span class="p">(</span><span class="nv">rgb</span> <span class="ss">:red</span> <span class="mh">#xfe</span> <span class="ss">:blue</span> <span class="mh">#xac</span><span class="p">)</span>
+<span class="c1">;; (254 0 172)</span>
 </pre></div>
 <p>When mixing the various types of parameters, the order should always be</p>
 <ul class="simple">
@@ -205,28 +212,28 @@ calling the function and the name for the param:</p>
 <li>&amp;key params</li>
 </ul>
 <p>Combining optional and keyword params is not such a good idea</p>
-<div class="highlight"><pre>(defun foo (x &amp;optional y &amp;key z) (list x y z))
-;; (foo 1 2 :z 3)
-;; (1 2 3)
-;;
-;; (foo 1)
-;; (1 NIL NIL)
-;;
-;; (foo 1 :z 3)
-;; ERROR
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">foo</span> <span class="p">(</span><span class="nv">x</span> <span class="k">&amp;optional</span> <span class="nv">y</span> <span class="k">&amp;key</span> <span class="nv">z</span><span class="p">)</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">x</span> <span class="nv">y</span> <span class="nv">z</span><span class="p">))</span>
+<span class="c1">;; (foo 1 2 :z 3)</span>
+<span class="c1">;; (1 2 3)</span>
+<span class="c1">;;</span>
+<span class="c1">;; (foo 1)</span>
+<span class="c1">;; (1 NIL NIL)</span>
+<span class="c1">;;</span>
+<span class="c1">;; (foo 1 :z 3)</span>
+<span class="c1">;; ERROR</span>
 </pre></div>
 <p>The reason why the last call resulted in an error is that even though we meant
 to pass the :z kwarg, Lisp would interpret the :z as the argument for the param
-<cite>y</cite>, after which a keyword param or nothing is expected. But that leaves just 3
+<tt class="docutils literal">y</tt>, after which a keyword param or nothing is expected. But that leaves just 3
 which will not be parsed as a legal kwarg.</p>
 <p>Mixing rest and keyword params, is, however safe. When both &amp;rest and &amp;key
 params are present in a function's parameter list, the passed in arguments,
 after filling in any required and optional parameters, are ALL collected into
 the &amp;rest variable, along with the keywords and the appropriate &amp;key params are
 also bound to appropriate values.</p>
-<div class="highlight"><pre>(defun foo (&amp;rest rest &amp;key a b c) (list rest a b c))
-;; (foo :a 12 :b 10)
-;; ((:A 12 :B 10) 12 10 NIL)
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">foo</span> <span class="p">(</span><span class="k">&amp;rest</span> <span class="nb">rest</span> <span class="k">&amp;key</span> <span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">rest</span> <span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">))</span>
+<span class="c1">;; (foo :a 12 :b 10)</span>
+<span class="c1">;; ((:A 12 :B 10) 12 10 NIL)</span>
 </pre></div>
 <p>But when &amp;rest is followed by a &amp;key, all that can be collected into the rest
 parameter variable is the plist passed in to the function for the keyword
@@ -243,11 +250,11 @@ BLOCK and gives it the same name as the function. Hence, we can break out of a
 function using RETURN-FROM by passing it two arguments, the unquoted name of
 the function(unquoted because it is not eval'd) to return from and the value to
 return.</p>
-<div class="highlight"><pre>(defun foo (n)
-  (dotimes (i 10)
-    (dotimes (j 10)
-      (when (&gt; (* i j) n)
-        (return-from foo (list i j))))))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">foo</span> <span class="p">(</span><span class="nv">n</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">dotimes</span> <span class="p">(</span><span class="nv">i</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="p">(</span><span class="nb">dotimes</span> <span class="p">(</span><span class="nv">j</span> <span class="mi">10</span><span class="p">)</span>
+      <span class="p">(</span><span class="nb">when</span> <span class="p">(</span><span class="nb">&gt;</span> <span class="p">(</span><span class="nb">*</span> <span class="nv">i</span> <span class="nv">j</span><span class="p">)</span> <span class="nv">n</span><span class="p">)</span>
+        <span class="p">(</span><span class="k">return-from</span> <span class="nv">foo</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">i</span> <span class="nv">j</span><span class="p">))))))</span>
 </pre></div>
 <p>This finds the first pair of numbers, both less than 10, whose product is less
 than the argument n.</p>

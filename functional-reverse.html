@@ -98,68 +98,81 @@
                 <section class="span9">
     <section class="row-fluid">
         <header class="span9 article-heading">
-            <h1><a href="efficient-c-n-r.html" rel="bookmark"
-                   title="Permalink to Calculating C(n, r) efficiently">
-                   Calculating C(n, r) efficiently</a></h1>
+            <h1><a href="functional-reverse.html" rel="bookmark"
+                   title="Permalink to Reversing a list recursively">
+                   Reversing a list recursively</a></h1>
         </header>
         <section class="span3">
-            Sat 27 October 2012 
+            Sun 21 April 2013 
         </section>
     </section>
     <section class="row-fluid">
         <section class="span11 article-content">
-            <p>Recently, I needed to calculate the number of ways in which r items can be
-chosen from n identical items. This is a classical counting problem and the
-number of ways in which r items can be chosen from n items is also known as the
-combination, $C(n,r)$,  ${}^{n}C_{r}$ or $ n \choose r $</p>
-<p>The expression for calculating <cite>C(n, r)</cite> is</p>
-<p>$$ {n \choose r} = \frac{n(n-1)(n-2)...(n-r+1)}{r(r-1)...1} $$</p>
-<p>or, equivalently, using factorials,</p>
-<p>$$ {n \choose r} = \frac{n!}{r!(n-r)!} $$</p>
-<p>One implementation would be to compute the constituent factorials and the
-perform the multiplication and division on them. But this is bad for 2 reasons</p>
-<ul class="simple">
-<li>It is slow.</li>
-<li>For even decent problems like C(100, 2), where the answer is 4950, the
-intermediate factorials are very large. 100! is approximately 9.33e57 and
-hence, languages that do not have numeric types to hold that kind of a
-number will overflow, wrecking a havoc - all for a result that fits well
-within 2 bytes!</li>
-</ul>
-<p>A better implementation should use this recurrence:</p>
-<p>$$ {n \choose r} =  \frac{n}{r} {{n-1} \choose {r-1}} $$</p>
-<p>with</p>
-<p>$$ {n \choose 1} = n $$
-$$ {n \choose 0} = 1 $$
-$$ {0 \choose r} = 0 $$</p>
-<p>so, a recursive implementation in Python would look like</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the number of ways r items can be chosen from a pool of n</span>
-<span class="sd">    identical items, with n &gt;= r</span>
+            <p>Suppose we have a list implementation in which every element (or node) in the
+list contains a <tt class="docutils literal">head</tt>, which is the item at this node and a <tt class="docutils literal">tail</tt>, which is
+rest of the list.</p>
+<div class="highlight"><pre><span class="k">trait</span> <span class="nc">List</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">isEmpty</span><span class="k">:</span> <span class="kt">Boolean</span>
+  <span class="k">def</span> <span class="n">head</span><span class="k">:</span> <span class="kt">Int</span>
+  <span class="k">def</span> <span class="n">tail</span><span class="k">:</span> <span class="kt">List</span>
+<span class="o">}</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">comb</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">r</span>
+<span class="k">class</span> <span class="nc">Cons</span><span class="o">(</span><span class="k">val</span> <span class="n">head</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="k">val</span> <span class="n">tail</span><span class="k">:</span> <span class="kt">List</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">List</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">isEmpty</span> <span class="k">=</span> <span class="kc">false</span>
+<span class="o">}</span>
+
+<span class="k">object</span> <span class="nc">Nil</span> <span class="k">extends</span> <span class="nc">List</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">isEmpty</span> <span class="k">=</span> <span class="kc">true</span>
+  <span class="k">def</span> <span class="n">head</span> <span class="k">=</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">NoSuchElementException</span><span class="o">(</span><span class="s">&quot;Nil.head&quot;</span><span class="o">)</span>
+  <span class="k">def</span> <span class="n">tail</span> <span class="k">=</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">NoSuchElementException</span><span class="o">(</span><span class="s">&quot;Nil.tail&quot;</span><span class="o">)</span>
+<span class="o">}</span>
 </pre></div>
-<p>An iterative implementation is also not very difficult to arrive at:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the number of ways r items can be chosen from a pool of n</span>
-<span class="sd">    identical items, with n &gt;= r</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">*=</span> <span class="n">n</span>
-        <span class="n">result</span> <span class="o">/=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">result</span>
+<p>One way to reverse this without any mutation is:</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="n">reversed</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">List</span><span class="o">)</span><span class="k">:</span> <span class="kt">List</span> <span class="o">=</span> <span class="o">{</span>
+  <span class="k">def</span> <span class="n">aux</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">List</span><span class="o">,</span> <span class="n">acc</span><span class="k">:</span> <span class="kt">List</span><span class="o">)</span> <span class="k">=</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">xs</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span> <span class="n">acc</span>
+    <span class="k">else</span> <span class="n">reversed</span><span class="o">(</span><span class="n">xs</span><span class="o">.</span><span class="n">tail</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Cons</span><span class="o">(</span><span class="n">xs</span><span class="o">.</span><span class="n">head</span><span class="o">,</span> <span class="n">acc</span><span class="o">))</span>
+  <span class="n">aux</span><span class="o">(</span><span class="n">xs</span><span class="o">,</span> <span class="nc">Nil</span><span class="o">)</span>
+<span class="o">}</span>
+</pre></div>
+<p>Here is how this works. Suppose we have a list [1, 2, 3, 4, 5]. This is
+represented in our scheme as:</p>
+<div class="highlight"><pre>  []
+ /  \
+1   []
+   /  \
+  2   []
+     /  \
+    3   []
+       /  \
+      4   []
+         /  \
+        5   Nil
+</pre></div>
+<p>Here, each node is a <tt class="docutils literal">Cons</tt> and the left child of a node is the value at that
+node and the right child is the tail, which can either be another <tt class="docutils literal">Cons</tt> or
+<tt class="docutils literal">Nil</tt>.</p>
+<p>The Scala code to create this list is:</p>
+<div class="highlight"><pre><span class="k">val</span> <span class="n">l</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Cons</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Cons</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Cons</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Cons</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Cons</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="nc">Nil</span><span class="o">)))))</span>
+</pre></div>
+<p>Now, in the <tt class="docutils literal">reversed</tt> function, all the work is done by the auxilliary inner
+function <tt class="docutils literal">aux</tt>. If the argument <tt class="docutils literal">xs</tt> to <tt class="docutils literal">aux</tt> is empty(meaning a <tt class="docutils literal">Nil</tt>),
+return the accumulator argument <tt class="docutils literal">acc</tt>. Otherwise, add the head of <tt class="docutils literal">xs</tt> to
+the accumulator and recursively call <tt class="docutils literal">reversed</tt> with just the tail of <tt class="docutils literal">xs</tt>.
+It is clear that the recursion always terminates, as <tt class="docutils literal">xs.tail</tt> will always have
+one element less than <tt class="docutils literal">xs</tt> and eventually, a call to <tt class="docutils literal">reversed(Nil, <span class="pre">...)</span></tt> will
+be made, which just returns the second argument, breaking the recursion. Let
+us trace the execution of reversed:</p>
+<div class="highlight"><pre>val l = new Cons(1, new Cons(2, new Cons(3, new Cons(4, new Cons(5, Nil)))))
+reversed(l)
+\_ aux([1, 2, 3, 4, 5], Nil)
+   \_ aux([2, 3, 4, 5], [1])
+      \_ aux([3, 4, 5], [2, 1])
+         \_ aux([4, 5], [3, 2, 1])
+            \_ aux([5], [4, 3, 2, 1])
+               \_ aux(Nil, [5, 4, 3, 2, 1])
+                   |
+&lt;------------------[5, 4, 3, 2, 1]
 </pre></div>
 
         </section>

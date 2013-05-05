@@ -11,6 +11,23 @@
         <link href="../theme/css/syntax.css" rel="stylesheet"
               media="screen" />
 
+                    
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type= "text/javascript">
+       MathJax.Hub.Config({
+           config: ["MMLorHTML.js"],
+           jax: ["input/TeX","input/MathML","output/HTML-CSS","output/NativeMML"],
+           TeX: { extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"], equationNumbers: { autoNumber: "AMS" } },
+           extensions: ["tex2jax.js","mml2jax.js","MathMenu.js","MathZoom.js"],
+           tex2jax: { 
+               inlineMath: [ ['$','$'] ],
+               displayMath: [ ['$$','$$'] ],
+               processEscapes: true },
+           "HTML-CSS": {
+               styles: { ".MathJax .mo, .MathJax .mi": {color: "black ! important"}}
+           }
+       });
+    </script>
+
             </head>
 
     <body>
@@ -80,26 +97,21 @@
                 </section>
                 <section class="span9">
     <section class="row-fluid">
-        <header class="article-heading">
-        <h1>Articles tagged <a style="color: rgb(0, 136, 204)"
-                    href="../tag/machine-learning.html">machine-learning</a></h1>
+        <header class="span9 article-heading">
+            <h1><a href="lisp-macros.html" rel="bookmark"
+                   title="Permalink to Common Lisp - Macros">
+                   Common Lisp - Macros</a></h1>
         </header>
-    </section>
-        <section class="row-fluid">
-        <section class="span9 postblock offset1">
-            <section class="row-fluid">
-                <section class="span9">
-                    <a href="../tanimoto-coefficient.html"><h3>The Tanimoto Coefficient</h3></a>
-                    <p class="first last">Calculating the Tanimoto coefficient</p>
-
-                </section>
-                <section class="span3 date muted">
-                    Sun 25 November 2012
-                </section>
-            </section>
+        <section class="span3">
+            Thu 04 April 2013 
         </section>
     </section>
+    <section class="row-fluid">
+        <section class="span11 article-content">
+            
+        </section>
     </section>
+</section>
             </section>
         </article>
         <hr />

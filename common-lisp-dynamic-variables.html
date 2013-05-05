@@ -98,69 +98,70 @@
                 <section class="span9">
     <section class="row-fluid">
         <header class="span9 article-heading">
-            <h1><a href="efficient-c-n-r.html" rel="bookmark"
-                   title="Permalink to Calculating C(n, r) efficiently">
-                   Calculating C(n, r) efficiently</a></h1>
+            <h1><a href="common-lisp-dynamic-variables.html" rel="bookmark"
+                   title="Permalink to Dynamic variables in Common Lisp">
+                   Dynamic variables in Common Lisp</a></h1>
         </header>
         <section class="span3">
-            Sat 27 October 2012 
+            Fri 29 March 2013 
         </section>
     </section>
     <section class="row-fluid">
         <section class="span11 article-content">
-            <p>Recently, I needed to calculate the number of ways in which r items can be
-chosen from n identical items. This is a classical counting problem and the
-number of ways in which r items can be chosen from n items is also known as the
-combination, $C(n,r)$,  ${}^{n}C_{r}$ or $ n \choose r $</p>
-<p>The expression for calculating <cite>C(n, r)</cite> is</p>
-<p>$$ {n \choose r} = \frac{n(n-1)(n-2)...(n-r+1)}{r(r-1)...1} $$</p>
-<p>or, equivalently, using factorials,</p>
-<p>$$ {n \choose r} = \frac{n!}{r!(n-r)!} $$</p>
-<p>One implementation would be to compute the constituent factorials and the
-perform the multiplication and division on them. But this is bad for 2 reasons</p>
-<ul class="simple">
-<li>It is slow.</li>
-<li>For even decent problems like C(100, 2), where the answer is 4950, the
-intermediate factorials are very large. 100! is approximately 9.33e57 and
-hence, languages that do not have numeric types to hold that kind of a
-number will overflow, wrecking a havoc - all for a result that fits well
-within 2 bytes!</li>
-</ul>
-<p>A better implementation should use this recurrence:</p>
-<p>$$ {n \choose r} =  \frac{n}{r} {{n-1} \choose {r-1}} $$</p>
-<p>with</p>
-<p>$$ {n \choose 1} = n $$
-$$ {n \choose 0} = 1 $$
-$$ {0 \choose r} = 0 $$</p>
-<p>so, a recursive implementation in Python would look like</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the number of ways r items can be chosen from a pool of n</span>
-<span class="sd">    identical items, with n &gt;= r</span>
+            <p>Many a time, global variables are needed to store stuff like standard I/O
+stream handles. In lisp, global variables are nicer to manage than their
+counterparts in other languages. These variables are called dynamic variables
+in Lisp, and as a convention, their names start and end with a *. There are two
+ways to define dynamic variables, DEFVAR and DEFPARAMETER. DEFVAR assigns to
+the variable only if it is undefined, while DEFPARAMETER works regardless. Both
+DEFVAR and DEFPARAMETER take a variable name, an initial value and an optional
+documentation string. One can leave out the initial value in a DEFVAR, which
+results in an unbound dynamic variable.</p>
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defvar</span> <span class="vg">*count*</span> <span class="mi">0</span>
+  <span class="s">&quot;Count of widgets made so far.&quot;</span><span class="p">)</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">comb</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">r</span>
+<span class="p">(</span><span class="nb">defparameter</span> <span class="vg">*gap-tolerance*</span> <span class="mf">0.001</span>
+  <span class="s">&quot;Tolerance to be allowed in widget gaps.&quot;</span><span class="p">)</span>
 </pre></div>
-<p>An iterative implementation is also not very difficult to arrive at:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the number of ways r items can be chosen from a pool of n</span>
-<span class="sd">    identical items, with n &gt;= r</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">*=</span> <span class="n">n</span>
-        <span class="n">result</span> <span class="o">/=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">result</span>
+<div class="section" id="rebinding-dynamic-variables">
+<h2>Rebinding dynamic variables</h2>
+<p>Sometimes, we need to be able to change the value of a global variable just for
+a part of our code. For example, the *standard-output* global variable is
+bound to the standard output stream. One might want a part of the code calling
+functions that write to *standard-output* to actually write to a file instead
+of writing it to stdout. We can do this by assigning to *standard-output*
+a handle to our file, executing our code and resetting *standard-output* to
+stdout. But a neater a way is provided by Lisp. Whenever a form introduces a
+variable having the same name as a dynamic variable, all code within the
+binding form and all code called by this code see the new binding. So for
+example, we can do this:</p>
+<div class="highlight"><pre><span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;This will be printed to stdout.~%&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="vg">*standard-output*</span> <span class="vg">*some-other-stream*</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;This will be printed to a file.~%&quot;</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;This will again be printed to stdout.~%&quot;</span><span class="p">)</span>
 </pre></div>
+<p>What is important to note is that while lexical variable bindings are seen only
+by code textually within the binding form of the variables(and closures, of
+course), all code CALLED from a binding form of a dynamic variable also sees the
+new binding. The binding is restored as soon as the binding form is done
+executing.</p>
+<p>An example:</p>
+<div class="highlight"><pre><span class="nv">CL-USER&gt;</span> <span class="p">(</span><span class="nb">defvar</span> <span class="vg">*x*</span> <span class="mi">10</span><span class="p">)</span>
+<span class="vg">*X*</span>
+<span class="nv">CL-USER&gt;</span> <span class="p">(</span><span class="nb">defun</span> <span class="nv">foo</span> <span class="p">()</span> <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;x: ~d~%&quot;</span> <span class="vg">*x*</span><span class="p">))</span>
+<span class="nv">STYLE-WARNING:</span> <span class="nv">redefining</span> <span class="nv">COMMON-LISP-USER::FOO</span> <span class="nv">in</span> <span class="nv">DEFUN</span>
+<span class="nv">FOO</span>
+<span class="nv">CL-USER&gt;</span> <span class="p">(</span><span class="nv">foo</span><span class="p">)</span>
+<span class="nv">x:</span> <span class="mi">10</span>
+<span class="no">NIL</span>
+<span class="nv">CL-USER&gt;</span> <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="vg">*x*</span> <span class="mi">100</span><span class="p">))</span> <span class="p">(</span><span class="nv">foo</span><span class="p">))</span>
+<span class="nv">x:</span> <span class="mi">100</span>
+<span class="no">NIL</span>
+<span class="nv">CL-USER&gt;</span> <span class="p">(</span><span class="nv">foo</span><span class="p">)</span>
+<span class="nv">x:</span> <span class="mi">10</span>
+<span class="no">NIL</span>
+</pre></div>
+</div>
 
         </section>
     </section>

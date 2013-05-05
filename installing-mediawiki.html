@@ -98,69 +98,62 @@
                 <section class="span9">
     <section class="row-fluid">
         <header class="span9 article-heading">
-            <h1><a href="efficient-c-n-r.html" rel="bookmark"
-                   title="Permalink to Calculating C(n, r) efficiently">
-                   Calculating C(n, r) efficiently</a></h1>
+            <h1><a href="installing-mediawiki.html" rel="bookmark"
+                   title="Permalink to Installing MediaWiki locally">
+                   Installing MediaWiki locally</a></h1>
         </header>
         <section class="span3">
-            Sat 27 October 2012 
+            Thu 15 November 2012 
         </section>
     </section>
     <section class="row-fluid">
         <section class="span11 article-content">
-            <p>Recently, I needed to calculate the number of ways in which r items can be
-chosen from n identical items. This is a classical counting problem and the
-number of ways in which r items can be chosen from n items is also known as the
-combination, $C(n,r)$,  ${}^{n}C_{r}$ or $ n \choose r $</p>
-<p>The expression for calculating <cite>C(n, r)</cite> is</p>
-<p>$$ {n \choose r} = \frac{n(n-1)(n-2)...(n-r+1)}{r(r-1)...1} $$</p>
-<p>or, equivalently, using factorials,</p>
-<p>$$ {n \choose r} = \frac{n!}{r!(n-r)!} $$</p>
-<p>One implementation would be to compute the constituent factorials and the
-perform the multiplication and division on them. But this is bad for 2 reasons</p>
-<ul class="simple">
-<li>It is slow.</li>
-<li>For even decent problems like C(100, 2), where the answer is 4950, the
-intermediate factorials are very large. 100! is approximately 9.33e57 and
-hence, languages that do not have numeric types to hold that kind of a
-number will overflow, wrecking a havoc - all for a result that fits well
-within 2 bytes!</li>
-</ul>
-<p>A better implementation should use this recurrence:</p>
-<p>$$ {n \choose r} =  \frac{n}{r} {{n-1} \choose {r-1}} $$</p>
-<p>with</p>
-<p>$$ {n \choose 1} = n $$
-$$ {n \choose 0} = 1 $$
-$$ {0 \choose r} = 0 $$</p>
-<p>so, a recursive implementation in Python would look like</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the number of ways r items can be chosen from a pool of n</span>
-<span class="sd">    identical items, with n &gt;= r</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">comb</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">r</span>
+            <p>I am a complete newbie to Wikimedia-land. The first thing that evidently
+tripped me was the names. They seemed to be random permutations of the words
+&quot;Wiki&quot;, &quot;Media&quot; and &quot;Pedia&quot;. <a class="reference external" href="http://www.mediawiki.org/wiki/Wikipmediawiki">This page</a> cleared all the confusion.</p>
+<p>The installation of MediaWiki is pretty straightforward. I am using Apache and
+MySQL to power my wiki, but there are options to use other webservers and
+databases.</p>
+<p>MediaWiki is available for <a class="reference external" href="http://www.mediawiki.org/wiki/Download">download here</a>. It is also possible to clone the git
+repository(more info <a class="reference external" href="http://www.mediawiki.org/wiki/Download_from_Git">here</a>).</p>
+<p>Once downloaded, the simplest way to install MediaWiki is to extract the
+tarball into the httpd(Apache) public folder - commonly called the document
+root or the docroot. For me, this is <tt class="docutils literal">/var/www/html</tt>.</p>
+<div class="highlight"><pre># tar xzv &lt;/home/yati/Downloads/mediawiki-*.tar.gz -C /var/www/html/
+# mv /var/www/html/mediawiki-* mediawiki
 </pre></div>
-<p>An iterative implementation is also not very difficult to arrive at:</p>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Find the number of ways r items can be chosen from a pool of n</span>
-<span class="sd">    identical items, with n &gt;= r</span>
+<p>I run Fedora, and the PHP installation by default does not log any error
+information. I changed this because I was experiencing some problems with the
+MediaWiki installation. This can be done by editing the <tt class="docutils literal">php.ini</tt> file, which
+is <tt class="docutils literal">/etc/php.ini</tt> for me.</p>
+<div class="highlight"><pre>error_reporting = E_ALL | E_STRICT
 
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">*=</span> <span class="n">n</span>
-        <span class="n">result</span> <span class="o">/=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">result</span>
+error_log = syslog
 </pre></div>
+<p>Apache should be restarted after editing <tt class="docutils literal">php.ini</tt></p>
+<div class="highlight"><pre># apachectl -k restart
+</pre></div>
+<p>This allowed me to troubleshoot the installation by just <tt class="docutils literal"><span class="pre">tail``ing</span>
+<span class="pre">``/var/log/messages</span></tt>. Next, pointing the browser to
+<tt class="docutils literal"><span class="pre">http://localhost/mediawiki</span></tt> brought up a nice picture of a flower and a link
+to start setting up the wiki. However, clicking on that link got me a blank
+page. Looking in the logs, I found the reason</p>
+<div class="highlight"><pre># tail /var/log/messages
+...
+Nov 15 22:57:26 localhost httpd: PHP Fatal error:  Class &#39;DOMDocument&#39; not found in /var/www/html/mediawiki/includes/LocalisationCache.php on line 542
+</pre></div>
+<p>Someone in #mediawiki on <a class="reference external" href="irc://irc.freenode.net">Freenode</a> pointed out that I am missing the PHP
+DOM extension that allows PHP developers to hack the Document Object Model(DOM)
+from within PHP. <a class="reference external" href="http://ru2.php.net/manual/en/intro.dom.php">This</a> is the extension page with detailed instructions on
+installation and configuration on different operating systems. On Fedora, this
+is how that extension is installed:</p>
+<div class="highlight"><pre># yum -y install php-xml
+</pre></div>
+<p>After this, to allow the automatic loading of this extension when PHP starts,
+the <tt class="docutils literal">php.ini</tt> file needs to be edited to include the following line:</p>
+<div class="highlight"><pre>extension = dom.so
+</pre></div>
+<p>After restarting Apache</p>
 
         </section>
     </section>

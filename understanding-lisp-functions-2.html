@@ -54,7 +54,7 @@
                                     <a tabindex="-1" href="./categories.html">Categories</a>
                                     <ul class="dropdown-menu">
                                                                                 <li>
-                                        <a tabindex="-1" href="./category/machine-learning.html">Machine Learning</a>
+                                        <a tabindex="-1" href="./category/foss.html">FOSS</a>
                                         </li>
                                                                                 <li>
                                         <a tabindex="-1" href="./category/misc.html">misc</a>
@@ -76,13 +76,20 @@
                             <span class="nav-header">Tag Cloud</span>
                             <section class="well sidebar-nav" id="tag-cloud">
                                 <ul>
+                                                                        <li class="tag-4"><a href="./tag/Go.html">Go</a></li>
                                                                         <li class="tag-4"><a href="./tag/decorators.html">decorators</a></li>
-                                                                        <li class="tag-2"><a href="./tag/lisp.html">lisp</a></li>
-                                                                        <li class="tag-1"><a href="./tag/programming.html">programming</a></li>
-                                                                        <li class="tag-4"><a href="./tag/machine-learning.html">machine-learning</a></li>
-                                                                        <li class="tag-4"><a href="./tag/algorithms.html">algorithms</a></li>
-                                                                        <li class="tag-4"><a href="./tag/math.html">math</a></li>
+                                                                        <li class="tag-4"><a href="./tag/scipy.html">scipy</a></li>
+                                                                        <li class="tag-2"><a href="./tag/algorithms.html">algorithms</a></li>
+                                                                        <li class="tag-2"><a href="./tag/math.html">math</a></li>
                                                                         <li class="tag-2"><a href="./tag/python.html">python</a></li>
+                                                                        <li class="tag-4"><a href="./tag/scala.html">scala</a></li>
+                                                                        <li class="tag-4"><a href="./tag/functional-programming.html">functional-programming</a></li>
+                                                                        <li class="tag-1"><a href="./tag/programming.html">programming</a></li>
+                                                                        <li class="tag-1"><a href="./tag/lisp.html">lisp</a></li>
+                                                                        <li class="tag-4"><a href="./tag/machine-learning.html">machine-learning</a></li>
+                                                                        <li class="tag-4"><a href="./tag/Wikipedia.html">Wikipedia</a></li>
+                                                                        <li class="tag-4"><a href="./tag/MediaWiki.html">MediaWiki</a></li>
+                                                                        <li class="tag-4"><a href="./tag/FOSS.html">FOSS</a></li>
                                                                     </ul>
                             </section>
                         </section>
@@ -110,17 +117,17 @@ function, returns the function object by that name.</p>
 FUNCALL and APPLY. When the number of arguments that the function takes is
 known, FUNCALL can be used. It takes a function object as its first argument
 and all subsequent arguments are passed to the function itself. i.e.,</p>
-<div class="highlight"><pre>(foo 1 2 3) === (funcall #&#39;foo 1 2 3)
+<div class="highlight"><pre><span class="p">(</span><span class="nv">foo</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span> <span class="nv">===</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nf">#&#39;</span><span class="nv">foo</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 <p>For example, this function <cite>plot</cite> takes a function, the min and max X values
 and the step and plots a simple ASCII plot of the function in the range
 [min, max]</p>
-<div class="highlight"><pre>(defun plot (fn min max step)
-  (loop for i from min to max do
-        (loop repeat (fn i) (format t &quot;*&quot;))
-        (format t &quot;~%&quot;)))
+<div class="highlight"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">plot</span> <span class="p">(</span><span class="nv">fn</span> <span class="nb">min</span> <span class="nb">max</span> <span class="nb">step</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">loop</span> <span class="nv">for</span> <span class="nv">i</span> <span class="nv">from</span> <span class="nb">min</span> <span class="nv">to</span> <span class="nb">max</span> <span class="nb">do</span>
+        <span class="p">(</span><span class="nb">loop</span> <span class="nv">repeat</span> <span class="p">(</span><span class="nv">fn</span> <span class="nv">i</span><span class="p">)</span> <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;*&quot;</span><span class="p">))</span>
+        <span class="p">(</span><span class="nb">format</span> <span class="no">t</span> <span class="s">&quot;~%&quot;</span><span class="p">)))</span>
 
-(plot #&#39;(lambda (x) (* x x)) -5 5 .5)
+<span class="p">(</span><span class="nv">plot</span> <span class="nf">#&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">*</span> <span class="nv">x</span> <span class="nv">x</span><span class="p">))</span> <span class="mi">-5</span> <span class="mi">5</span> <span class="mf">.5</span><span class="p">)</span>
 </pre></div>
 <p>will print</p>
 <div class="highlight"><pre>*************************
@@ -148,13 +155,13 @@ and the step and plots a simple ASCII plot of the function in the range
 <p>When the arguments to be passed to a function are available as a list, APPLY
 can be used conveniently. Say plot-data is a list containing a function, the
 min and the max values, and the step value. Then, plot can be invoked as:</p>
-<div class="highlight"><pre>(apply #&#39;plot plot-data)
+<div class="highlight"><pre><span class="p">(</span><span class="nb">apply</span> <span class="nf">#&#39;</span><span class="nv">plot</span> <span class="nv">plot-data</span><span class="p">)</span>
 </pre></div>
 <p>APPLY expects the function as its first argument and then, it expects a list,
 which is to eventually become the argument list of the passed in function. It
 also supports loose arguments. Say plot-data only contained min, max and step.
 We can still call the PLOT function to plot the exponential function as follows:</p>
-<div class="highlight"><pre>(apply #&#39;plot #&#39;exp plot-data)
+<div class="highlight"><pre><span class="p">(</span><span class="nb">apply</span> <span class="nf">#&#39;</span><span class="nv">plot</span> <span class="nf">#&#39;</span><span class="nb">exp</span> <span class="nv">plot-data</span><span class="p">)</span>
 </pre></div>
 <p>This, in effect, clubs the arguments after the first argument into a single
 list which is then passed to the function object given by the first argument.</p>
@@ -164,17 +171,17 @@ list which is then passed to the function object given by the first argument.</p
 another function, defining a named function might be an overkill, and one can
 use anonymous functions in such cases. These are created using LAMBDA
 expressions. A lambda expression has the following form:</p>
-<div class="highlight"><pre>(lambda (parameters) body)
+<div class="highlight"><pre><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">parameters</span><span class="p">)</span> <span class="nv">body</span><span class="p">)</span>
 </pre></div>
 <p>A lambda expression can also be thought of as a function name where the name
 itself specifies what the function does. We can use lambda expressions anywhere
 we would use function names.</p>
-<div class="highlight"><pre>(funcall #&#39;(lambda (x y) (+ x y)) 2 3)
-;; 5
+<div class="highlight"><pre><span class="p">(</span><span class="nb">funcall</span> <span class="nf">#&#39;</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span> <span class="nv">y</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="nv">y</span><span class="p">))</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span>
+<span class="c1">;; 5</span>
 </pre></div>
 <p>OR</p>
-<div class="highlight"><pre>((lambda (x y) (+ x y)) 2 3)
-;; 5
+<div class="highlight"><pre><span class="p">((</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span> <span class="nv">y</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="nv">y</span><span class="p">))</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">)</span>
+<span class="c1">;; 5</span>
 </pre></div>
 </div>
 
