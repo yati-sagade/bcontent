@@ -1207,4 +1207,217 @@ some other can be written as&lt;/p&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-</summary><category term="Go"></category><category term="programming"></category></entry></feed>
+</summary><category term="Go"></category><category term="programming"></category></entry><entry><title>Configuring an HTTPS site with Django on Nginx + Gunicorn</title><link href="/nginx-gunicorn-https.html" rel="alternate"></link><updated>2012-05-11T00:00:00+02:00</updated><author><name>Yati Sagade</name></author><id>tag:,2012-05-11:nginx-gunicorn-https.html</id><summary type="html">&lt;p&gt;I have deployed quite a few Django powered sites(or projects, if you will) on PaaS like &lt;a class="reference external" href="https://openshift.redhat.com/app/"&gt;OpenShift&lt;/a&gt;, &lt;a class="reference external" href="https://developers.google.com/appengine/"&gt;Google AppEngine&lt;/a&gt; and most of the time, personal projects are best hosted on a PaaS (I'm a big PaaS fan). But I was required to deploy my final semester project on our college server. Admittedly, deployment is the single most diffcult task for newcomers. I scoured the Web, spoke to guys on IRC and finally was able to deploy Django on &lt;a class="reference external" href="http://wiki.nginx.org/Main"&gt;Nginx&lt;/a&gt; and &lt;a class="reference external" href="http://gunicorn.org/"&gt;Gunicorn&lt;/a&gt; over HTTPS (my site uses HTTPS throughout).&lt;/p&gt;
+&lt;div class="section" id="step-0x00-the-dummy-project"&gt;
+&lt;h2&gt;Step 0x00: The dummy project&lt;/h2&gt;
+&lt;p&gt;Create the virtualenv for our project:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;$ mkdir dummy
+$ virtualenv --no-site-packages dummy
+New python executable in dummy/bin/python
+Installing setuptools............done.
+Installing pip...............done.
+$ source ./dummy/bin/activate
+(dummy)$ pip install django
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So now we're working in the virtualenv and have the latest stable Django installed. Switch to your projects directory and start a new Django project.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)$ django-admin.py startproject dummy_project
+(dummy)$ cd dummy_project
+(dummy)$ ls
+manage.py dummy_project
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now test if this is working fine in Django's development server:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)$ python manage.py runserver
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;and go to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://localhost:8000/&lt;/span&gt;&lt;/tt&gt; in your browser. You should see the Django welcome page.
+Stop the development server for now and let's move on to the next step.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-0x01-installing-gunicorn"&gt;
+&lt;h2&gt;Step 0x01: Installing Gunicorn&lt;/h2&gt;
+&lt;p&gt;Gunicorn 'Green Unicorn' is a Python WSGI HTTP Server for UNIX. It is lightweight and supports Django out-of-the-box. To install, simply do&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)$ pip install gunicorn
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This will install Gunicorn in the current virtualenv (dummy here). To test if Gunicorn runs fine,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)$ cd /path/to/project/dir
+(dummy)$ gunicorn_django
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;You should see some output on the terminal. Point your browser to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://localhost:8000/&lt;/span&gt;&lt;/tt&gt; again to see if it works. (You did shut down the previously started development server, right?)&lt;/p&gt;
+&lt;p&gt;Now for deployment on a real production system, we'll need to pass a couple more options to gunicorn. Let's create a file called deploy.sh that contains the appropriate invocation for gunicorn&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nb"&gt;set&lt;/span&gt; -e
+&lt;span class="nv"&gt;LOGFILE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/path/to/logdir/dummy.log
+&lt;span class="nv"&gt;LOGDIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;dirname &lt;span class="nv"&gt;$LOGFILE&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="c"&gt;# Number of worker processes.&lt;/span&gt;
+&lt;span class="c"&gt;# Should be no less than the number of cores available and a popular formula&lt;/span&gt;
+&lt;span class="c"&gt;# is 1 + 2 * number of cores.&lt;/span&gt;
+&lt;span class="nv"&gt;NUM_WORKERS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;3
+
+&lt;span class="nv"&gt;USER&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;youruser
+
+&lt;span class="nv"&gt;GROUP&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;youruser
+
+&lt;span class="nb"&gt;cd&lt;/span&gt; /path/to/project/dir
+
+&lt;span class="c"&gt;# Activate the virtualenv - replace the path with the path to wherever your venv lives.&lt;/span&gt;
+&lt;span class="nb"&gt;source&lt;/span&gt; /path/to/virtualenv/dummy/bin/activate
+
+&lt;span class="nb"&gt;test&lt;/span&gt; -d &lt;span class="nv"&gt;$LOGDIR&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; mkdir -p &lt;span class="nv"&gt;$LOGDIR&lt;/span&gt;
+
+&lt;span class="c"&gt;# Finally, the invocation&lt;/span&gt;
+gunicorn_django -w &lt;span class="nv"&gt;$NUM_WORKERS&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    --user&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$USER&lt;/span&gt; --group&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$GROUP&lt;/span&gt; --log-level&lt;span class="o"&gt;=&lt;/span&gt;debug &lt;span class="se"&gt;\&lt;/span&gt;
+    --log-file&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$LOGFILE&lt;/span&gt; 2&amp;amp;gt;&amp;amp;gt;&lt;span class="nv"&gt;$LOGFILE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now make this file executable by doing&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)$ chmod a+x deploy.sh
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;At this point, simply executing deploy.sh should bring up gunicorn and allow us to view the welcome page on &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://localhost:8000/&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-0x02-installing-and-configuring-supervisor"&gt;
+&lt;h2&gt;Step 0x02: Installing and configuring Supervisor&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="http://supervisord.org/"&gt;Supervisor&lt;/a&gt; is a client/server system that allows its users to monitor and control a number of processes on UNIX-like operating systems. Why are we using it? Because it gives us control over our processes and we're able to configure things like log file paths in a central place - the supervisor configuration file. Also, adding a new project is as easy as a new block in the configuration file. Installing is super-easy&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)$ pip install supervisor
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Supervisor has two components - the server(called &lt;tt class="docutils literal"&gt;supervisord&lt;/tt&gt;), which daemonizes when run and the client tool(called &lt;tt class="docutils literal"&gt;supervisorctl&lt;/tt&gt;), which is used to start/stop our programs. Let's write the configuration file for supervisord.&lt;/p&gt;
+&lt;p&gt;Place the following in the &lt;tt class="docutils literal"&gt;etc&lt;/tt&gt; directory in your virtualenv - e.g., &lt;tt class="docutils literal"&gt;/path/to/venv/dummy/etc/&lt;/tt&gt; as &lt;tt class="docutils literal"&gt;supervisord.conf&lt;/tt&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;[program:dummy]
+directory = /path/to/project/dir
+user = youruser
+command = /path/to/deploy.sh
+stdout_logfile = /path/to/dummy.log
+stderr_logfile = /path/to/dummy.log
+
+[unix_http_server]
+file=/tmp/supervisor.sock   ; (the path to the socket file)
+
+[supervisord]
+logfile=/tmp/supervisord.log ; (main log file;default $CWD/supervisord.log)
+logfile_maxbytes=50MB        ; (max main logfile bytes b4 rotation;default 50MB)
+logfile_backups=10           ; (num of main logfile rotation backups;default 10)
+loglevel=info                ; (log level;default info; others: debug,warn,trace)
+pidfile=/tmp/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+nodaemon=false               ; (start in foreground if true;default false)
+minfds=1024                  ; (min. avail startup file descriptors;default 1024)
+minprocs=200                 ; (min. avail process descriptors;default 200)
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///tmp/supervisor.sock ; use a unix:// URL  for a unix socket
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Be very sure to change the parameters according to your settings. Once the conf file is written, we can start &lt;tt class="docutils literal"&gt;supervisord&lt;/tt&gt; as root (remember, it needs to daemonize). You will need to &lt;tt class="docutils literal"&gt;su&lt;/tt&gt; to root and then activate the &lt;tt class="docutils literal"&gt;dummy&lt;/tt&gt; virtualenv. Then do&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)# supervisord
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;At this point, you may want to read up on the official &lt;a class="reference external" href="http://supervisord.org/"&gt;Supervisor&lt;/a&gt; docs.&lt;/p&gt;
+&lt;p&gt;Okay so let us test Supervisor. As root (and in the &lt;tt class="docutils literal"&gt;dummy&lt;/tt&gt; virtualenv), do&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)# supervisorctl start dummy
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then check with your browser. To stop,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)# supervisorctl stop dummy
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Note that running this as root does not expose any security threats, as supervisorctl runs the actual process as the user indicated in the config file. So unless &lt;em&gt;that&lt;/em&gt; is set to root, you're okay.
+After ensuring supervisor is running fine, move on to the next step:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="step-0x03-installing-and-configuring-nginx"&gt;
+&lt;h2&gt;Step 0x03: Installing and configuring Nginx&lt;/h2&gt;
+&lt;p&gt;nginx [engine x] is an HTTP and reverse proxy server, as well as a mail proxy server, written by Igor Sysoev. It is used widely to serve static files, but we'll also use it as a reverse proxy for our upstream gunicorn server. Basically, nginx will handle all real requests from the outside world, and delegate these to the gunicorn server running on port 8000 (or whichever port you decide to run it on). Requests for static files will be directly served by nginx.&lt;/p&gt;
+&lt;p&gt;To install nginx on Fedora or RedHat,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# yum install nginx
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;On Debian/Ubuntu, just use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;apt-get&lt;/span&gt;&lt;/tt&gt; instead of &lt;tt class="docutils literal"&gt;yum&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Once installed, let's configure Nginx. You should read up on the official Nginx docs to know how to configure vhosts, but to keep it simple here, let's modify the default config file which, on my Fedora box, sits at &lt;tt class="docutils literal"&gt;/etc/nginx/conf.d/default.conf&lt;/tt&gt;.  I wanted all areas of my site SSL protected. If you have an area in your site that does not &lt;em&gt;need&lt;/em&gt; to have SSL/TLS, please do not use it - it is unnecessary hard work for the server. But if you need it, do not shy away.&lt;/p&gt;
+&lt;p&gt;To configure SSL, we first need to have our SSL certificate - which can be later signed by a renowned certificate authority(CA) like Verisign. First install OpenSSL on your system&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# yum install openssl
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then, change to a directory where you want to store your certificate - note that while this directory must be readable by Nginx, it must not be readable by all users, as it will contain the server's private key. Once you're in the directory, say  &lt;tt class="docutils literal"&gt;/path/to/cert/&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Create the private key:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;$ openssl genrsa -out dummy-key.pem 1024
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Create the CSR - Certificate Signing Request file(sent to CAs to sign our certificate)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;$ openssl req -new -key dummy-key.pem -out dummy-csr.pem
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We're not sending this CSR over to a CA now. Instead, we'll &amp;quot;self-sign&amp;quot; it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;$ openssl x509 -req -in dummy-csr.pem -signkey dummy-key.pem -out dummy-cert.pem
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This generates the certificate in &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;dummy-cert.pem&lt;/span&gt;&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;Now to configure Nginx.
+Open up &lt;tt class="docutils literal"&gt;/etc/nginx/conf.d/default.conf&lt;/tt&gt; (on Fedora) and edit it as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;#
+# The default server
+#
+server {
+    listen 80;
+    # If you want certain Non-SSL areas on your site, add a location block here
+    # read up on the nginx docs.
+    # Be sure to replace localhost in the following rule to the server name/IP address.
+    return 301 https://localhost/;
+}
+server {
+    listen  443 ssl;
+    # server_name  _;
+    # start mine
+    ssl on;
+    ssl_certificate /path/to/cert/dummy-cert.pem;
+    ssl_certificate_key /path/to/cert/dummy-key.pem;
+    ssl_protocols        SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers          HIGH:!aNULL:!MD5;
+    server_name localhost;
+    # full path to the project dir - the dir that contains the urls.py file
+    root /path/to/project/dir/dummy;
+    access_log /path/to/logdir/nginx_access.log;
+    error_log /path/to/logdir/nginx_error.log;
+
+    location /static/{
+        autoindex on;
+        # The path to the actual project directory here - the one which contains the static/
+        # dir holding the static files for this project
+        root /path/to/project/dir/dummy;
+    }
+
+    location / {
+        proxy_pass_header Server;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_connect_timeout 10;
+        proxy_read_timeout 10;
+        proxy_pass http://localhost:8000/;
+    }
+
+    error_page  404              /404.html;
+    location = /404.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The first &lt;tt class="docutils literal"&gt;server&lt;/tt&gt; block is for HTTP(port 80). Since I want all HTTP requests to be redirected to use HTTPS, we return a HTTP 301(permanent redirect) to our HTTPS server (BTW, HTTPS standard port is 443).&lt;/p&gt;
+&lt;p&gt;The next &lt;tt class="docutils literal"&gt;server&lt;/tt&gt; block configures SSL by pointing Nginx to the private key and certificate we created. Now in the settings module of your Django project, do these settings:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+&lt;span class="n"&gt;SESSION_COOKIE_SECURE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="n"&gt;STATIC_ROOT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dirname&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;abspath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;__file__&lt;/span&gt;&lt;span class="p"&gt;)),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;static&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c"&gt;# URL prefix for static files.&lt;/span&gt;
+&lt;span class="c"&gt;# Example: &amp;quot;http://media.lawrence.com/static/&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;STATIC_URL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;/static/&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Once that is done, start up Nginx as root(on Fedora):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# service nginx start
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If that does not work, simply start nginx:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;# nginx
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now, from the virtualenv, start our &amp;quot;program&amp;quot; using &lt;tt class="docutils literal"&gt;supervisorctl&lt;/tt&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;(dummy)# supervisorctl start dummy
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Point your browser to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;https://localhost/&lt;/span&gt;&lt;/tt&gt; to see your app working. Note that since the digital certificate we created is self-signed, browsers will typically show a warning when using HTTPS. This is normal. On &lt;em&gt;real&lt;/em&gt; production systems using HTTPS, you should get your certificate signed by a CA. It costs some money to get the CA issue a signed certifcate to you, but it is worth it.&lt;/p&gt;
+&lt;p&gt;That is all there is to deploying a Django app on Nginx + Gunicorn over HTTPS.&lt;/p&gt;
+&lt;/div&gt;
+</summary><category term="nginx"></category><category term="django"></category><category term="python"></category><category term="gunicorn"></category></entry></feed>
